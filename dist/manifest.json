@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "YT Downloader",
+  "version": "1.0",
+  "description": "Extensión para gestionar descargas de youtube",
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "icon.png"
+  },
+  "permissions": ["downloads"]
+}
