@@ -1,11 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YT Downloader</title>
+    <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    
+    <div class="contenedor-base">
+
+        <h2>Descargador De Videos YT</h2>
+
+        <p id="message"></p>
+
+        <input type="text" placeholder="Ingresa La Url Del Video..." id="urlInput">
+        
+        <div id="preview" class="preview">Video: </div>
+        
+        <button id="BtnDownload">Descargar</button>
+
+        
+    </div>
+
+    <script src="popup.js"></script>
 </body>
 </html>
