@@ -1,5 +1,5 @@
 document.getElementById("downloadBtn").addEventListener("click", () => {
-  const url = document.getElementById("urlInput").value.trim();  // ✅ () ejecuta .trim()
+  const url = document.getElementById("urlInput").value.trim();  
   const message = document.getElementById("message");
   const preview = document.getElementById("preview");
 
@@ -16,7 +16,7 @@ document.getElementById("downloadBtn").addEventListener("click", () => {
     return;
   }
 
-  const videoId = match[1]; // ✅ se usa solo si match existe
+  const videoId = match[1]; // 
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
   const apiUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
 
