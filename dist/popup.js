@@ -1,38 +1,67 @@
-document.getElementById("downloadBtn").addEventListener("click", () => {
-  const url = document.getElementById("urlInput").value.trim();  
-  const message = document.getElementById("message");
-  const preview = document.getElementById("preview");
+const API_BASE = "http://127.0.0.1:5000";
 
-  if (!url) {
-    message.textContent = "⚠️ Ingresa una URL.";
-    message.style.color = "red";
-    return;
-  }
+const urlInput = document.getElementById("urlInput");
+const checkBtn = document.getElementById("checkBtn");
+const downloadBtn = document.getElementById("downloadBtn");
+const preview = document.getElementById("preview");
+const formatSelect = document.getElementById("formatSelect");
+const message = document.getElementById("message");
 
-  const match = url.match(/(?:v=|\.be\/)([a-zA-Z0-9_-]{11})/);
-  if (!match) {
-    message.textContent = "⚠️ No parece un link válido de YouTube.";
-    message.style.color = "red";
-    return;
-  }
+let currentUrl = "";
 
-  const videoId = match[1]; // 
-  const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-  const apiUrl = `https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${videoId}&format=json`;
+checkBtn.addEventListener("click", async () => {
+  currentUrl = urlInput.value.trim();
+  if (!currentUrl) return alert("Ingresa una URL válida")
 
-  fetch(apiUrl)
-    .then(res => res.json())
-    .then(data => {
+    message.textContent = "Obteniendo Informacion..."
+    formatSelect.innerHTML = "";
+
+    try {
+      const res = await fetch(`${API_BASE}/api/formats`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: currentUrl})
+      });
+      const data = await res.json();
+
+      if(!data.ok) throw new Error(data.error);
+
       preview.innerHTML = `
-        <img src="${thumbnailUrl}" alt="Miniatura del video" width="100%" />
-        <p><strong>${data.title}</strong></p>
+        <img src="${data.thumbnail}" alt="Thumbnail">
+        <p><strong>${data.title}<strong></p>
       `;
-      message.textContent = "✅ Video detectado correctamente.";
-      message.style.color = "green";
-    })
-    .catch(() => {
-      preview.innerHTML = `<img src="${thumbnailUrl}" alt="Miniatura del video" width="100%" />`;
-      message.textContent = "⚠️ Miniatura mostrada, pero no se pudo obtener el título.";
-      message.style.color = "orange";
+
+      data.formats.forEach(f => {
+        const opt = document.createElement("option");
+        opt.value = f.format_id;
+        const sizeMB = f.filesize ? (f.filesize / (1024*1024)).toFixed(1) + "MB" : "Tamaño desconocido";
+        opt.textContent = `${f.height || "Audio"}p ${f.ext} — ${sizeMB}`;
+        formatSelect.appendChild(opt);
+      });
+      message.textContent = "Selecciona una calidad y presiona Descargar"
+    } catch (err) {
+      message.textContent = "Error: " + err.message;
+    }
+});
+
+downloadBtn.addEventListener("click", async () => {
+  const formatId = formatSelect.value;
+  if (!formatId || !currentUrl) return alert("Selecciona un Formato Primero.");
+
+  message.textContent = "Descargando..."
+
+  try {
+    const res = await fetch(`${API_BASE}/api/download`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json"},
+      body: JSON.stringify({ url: currentUrl, format_id: formatId })
     });
+    const data = await res.json();
+
+    if (!data.ok) throw new Error(data.error);
+
+    message.innerHTML = `"Descarga lista: <a href="${API_BASE}${data.download_url}" target="_blank">Haz Click Aqui</a>`;
+  } catch (err) {
+    message.textContent = "Error en la descarga: " + err.message;
+  }
 });

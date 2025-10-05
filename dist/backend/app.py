@@ -1,21 +1,24 @@
 from flask import Flask, request, jsonify, send_from_directory
 import yt_dlp, os, uuid
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
-DOWNLOAD_DIR = "downloads"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DOWNLOAD_DIR = os.path.join(BASE_DIR, "downloads")
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 @app.route("/api/formats", methods=["POST"])
 def list_formats():
-    data = request.get.json()
+    data = request.get_json()
     url = data.get("url")
     if not url:
         return jsonify({"ok": False, "error": "No URL"}), 400
     
     try:
         ydl_opts = {"quiet": True, "skip_download": True}
-        with ydl_opts.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=False)
         
         formats = []
@@ -42,7 +45,7 @@ def list_formats():
     except Exception as e:
         return jsonify({"ok": False, "error": str(e)}), 500
 
-app.route("/api/download", methods = ["POST"]) 
+@app.route("/api/download", methods = ["POST"]) 
 def download_video():
     data = request.get_json()
     url = data.get("url")
