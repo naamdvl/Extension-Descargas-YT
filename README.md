@@ -1,3 +1,7 @@
+<p aling="center">
+<img src="/dist/icon.png" alt="Vista Previa De El Icono De La Extension">
+</p>
+
 # Extension Descargador de Videos de YouTube 🎬
 
 Esta es una extensión de navegador con backend en Flask que permite descargar videos de YouTube en diferentes calidades directamente desde una interfaz sencilla.
